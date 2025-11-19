@@ -1,0 +1,155 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  OPS_MANAGER
+  DRIVER
+  GUIDE
+}
+
+enum OperationStatus {
+  PLANNED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum PaxStatus {
+  WAITING
+  CHECKED_IN
+  NO_SHOW
+}
+
+enum CheckinMethod {
+  QR
+  MANUAL
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  role      UserRole
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // one driver can have many vehicles
+  vehicles         Vehicle[]   @relation("UserVehicles")
+
+  // operations where this user is the driver
+  driverOperations Operation[] @relation("DriverOperations")
+
+  // operations where this user is the guide
+  guideOperations  Operation[] @relation("GuideOperations")
+}
+
+model Vehicle {
+  id       String  @id @default(cuid())
+  plate    String
+  name     String?
+
+  driverId String?
+  driver   User?   @relation("UserVehicles", fields: [driverId], references: [id])
+
+  lastLat     Float?
+  lastLng     Float?
+  lastHeading Float?
+  lastSpeed   Float?
+  lastPingAt  DateTime?
+
+  heartbeats Heartbeat[]
+  operations Operation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Operation {
+  id             String          @id @default(cuid())
+  code           String          @unique
+  tourName       String
+  date           DateTime
+  startTime      DateTime
+  status         OperationStatus
+  totalPax       Int             @default(0)
+  checkedInCount Int             @default(0)
+
+  vehicleId String?
+  vehicle   Vehicle? @relation(fields: [vehicleId], references: [id])
+
+  driverId String?
+  driver   User?   @relation("DriverOperations", fields: [driverId], references: [id])
+
+  guideId String?
+  guide   User?   @relation("GuideOperations", fields: [guideId], references: [id])
+
+  route Json?
+
+  pax        Pax[]
+  heartbeats Heartbeat[]
+  checkins   CheckinEvent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Pax {
+  id          String    @id @default(cuid())
+  operationId String
+  operation   Operation @relation(fields: [operationId], references: [id])
+
+  name  String
+  phone String?
+
+  pickupLat     Float
+  pickupLng     Float
+  pickupAddress String?
+
+  seatNo Int?
+  status PaxStatus @default(WAITING)
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  checkinEvents CheckinEvent[]
+}
+
+model Heartbeat {
+  id        String  @id @default(cuid())
+  vehicleId String
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id])
+
+  operationId String?
+  operation   Operation? @relation(fields: [operationId], references: [id])
+
+  lat       Float
+  lng       Float
+  speed     Float?
+  heading   Float?
+  timestamp DateTime
+
+  createdAt DateTime @default(now())
+}
+
+model CheckinEvent {
+  id      String @id @default(cuid())
+  eventId String @unique
+
+  paxId String
+  pax   Pax    @relation(fields: [paxId], references: [id])
+
+  operationId String
+  operation   Operation @relation(fields: [operationId], references: [id])
+
+  method   CheckinMethod
+  gpsLat   Float?
+  gpsLng   Float?
+  photoUrl String?
+
+  createdAt DateTime @default(now())
+}
