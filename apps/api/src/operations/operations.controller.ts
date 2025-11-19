@@ -27,7 +27,6 @@ export class OperationsController {
     @Query('date') date?: string,
     @Query('status') status?: OperationStatus,
   ) {
-    // TODO: validate date & status
     return this.operationsService.listAllOperations(date, status);
   }
 
