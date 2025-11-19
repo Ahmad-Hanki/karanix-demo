@@ -5,6 +5,7 @@ import {
   PrismaClient,
   UserRole,
 } from '@prisma/client';
+import { hash } from 'argon2';
 
 const prisma = new PrismaClient();
 
@@ -19,6 +20,7 @@ async function main() {
       name: 'Operations Manager',
       email: 'itxti909@gmail.com',
       role: UserRole.OPS_MANAGER,
+      password: await hash('12345'),
     },
   });
 
@@ -27,6 +29,7 @@ async function main() {
       name: 'John Driver',
       email: 'driver@example.com',
       role: UserRole.DRIVER,
+      password: await hash('12345'),
     },
   });
 
@@ -35,6 +38,7 @@ async function main() {
       name: 'Sarah Guide',
       email: 'guide@example.com',
       role: UserRole.GUIDE,
+      password: await hash('12345'),
     },
   });
 

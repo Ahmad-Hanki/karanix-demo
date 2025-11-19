@@ -53,6 +53,8 @@ model User {
   role      UserRole 
   // OPS_MANAGER, DRIVER or GUIDE
 
+  password  String
+
   createdAt DateTime @default(now())
   // When user was created
 
