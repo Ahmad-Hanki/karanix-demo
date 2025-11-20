@@ -12,7 +12,6 @@ export class AuthService {
   ) {}
   async validateLocalUser(createAuthDto: { email: string; password: string }) {
     const { email, password } = createAuthDto;
-    console.log('AuthService.validateLocalUser called2 ');
 
     if (!email || !password) {
       throw new HttpException(
@@ -29,9 +28,9 @@ export class AuthService {
       throw new HttpException(
         {
           message: 'Invalid email or password',
-          error: 'Unauthorized',
+          error: 'Not Found',
         },
-        HttpStatus.UNAUTHORIZED,
+        HttpStatus.NOT_FOUND,
       );
     }
 
@@ -41,18 +40,18 @@ export class AuthService {
         throw new HttpException(
           {
             message: 'Invalid email or password',
-            error: 'Unauthorized',
+            error: 'Forbidden',
           },
-          HttpStatus.UNAUTHORIZED,
+          HttpStatus.FORBIDDEN,
         );
       }
     } catch (err) {
       throw new HttpException(
         {
           message: 'Error verifying password',
-          error: 'Unauthorized',
+          error: 'Forbidden',
         },
-        HttpStatus.UNAUTHORIZED,
+        HttpStatus.FORBIDDEN,
       );
     }
 
@@ -65,7 +64,7 @@ export class AuthService {
   }
 
   async generateToken(userId: string) {
-    const payload: AuthJwtPayload = { userId: userId };
+    const payload: AuthJwtPayload = { userId };
     const accessToken = await this.jwtService.signAsync(payload, {
       expiresIn: '24h',
     });
@@ -80,13 +79,13 @@ export class AuthService {
       throw new HttpException(
         {
           message: 'User not found',
-          error: 'Unauthorized',
+          error: 'Not Found',
         },
-        HttpStatus.UNAUTHORIZED,
+        HttpStatus.NOT_FOUND,
       );
     }
 
-    const { password, ...rest } = user;
+    const { password, ...rest } = user; // returning all the user data except password in the jwt payload
     return rest;
   }
 }
