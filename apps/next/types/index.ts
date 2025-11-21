@@ -67,8 +67,25 @@ export type VehicleType = {
   lastPingAt: Date | null;
 };
 
+export type PaxStatus = "PLANNED" | "ACTIVE" | "COMPLETED" | "CANCELLED";
+
+export type PaxType = {
+  id: string;
+  status: PaxStatus;
+  createdAt: Date;
+  updatedAt: Date;
+  name: string;
+  operationId: string;
+  phone: string | null;
+  pickupLat: number;
+  pickupLng: number;
+  pickupAddress: string | null;
+  seatNo: number | null;
+};
+
 export type OperationWithRelations = OperationType & {
   vehicle: VehicleType | null;
   driver: User | null;
   guide: User | null;
+  pax: PaxType[] | null;
 };
