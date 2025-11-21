@@ -12,6 +12,8 @@ import { ApiError } from "@/types";
 import { AppProvider } from "./providers/query-client-provider";
 import { CookiesProvider } from "next-client-cookies/server";
 import { ToastContainer } from "react-toastify";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
+import Nav from "@/components/navbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -56,12 +58,15 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased mx-auto w-full max-w-7xl px-4 md:px-8 min-h-screen  overflow-x-hidden `}
       >
         <AppProvider>
           <HydrationBoundary state={dehydrate(queryClient)}>
             <CookiesProvider>
-              {children}
+              <NuqsAdapter>
+                <Nav />
+                {children}
+              </NuqsAdapter>
               <ToastContainer />
             </CookiesProvider>
           </HydrationBoundary>

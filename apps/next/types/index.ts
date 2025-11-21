@@ -23,6 +23,7 @@ export enum Role {
 }
 
 export type User = {
+  // also driver and guide
   email: string;
   password: string;
   id: string;
@@ -31,4 +32,43 @@ export type User = {
   createdAt: Date;
   updatedAt: Date;
   accessToken?: string;
+};
+export type OperationStatus = "PLANNED" | "ACTIVE" | "COMPLETED" | "CANCELLED";
+
+export type OperationType = {
+  id: string;
+  code: string;
+  tourName: string;
+  date: string; // ISO string from API (or Date if you parse)
+  startTime: string; // same here
+  status: OperationStatus;
+  totalPax: number;
+  checkedInCount: number;
+  vehicleId: string | null;
+  driverId: string | null;
+  guideId: string | null;
+  route: unknown | null; // or a more specific type if you know the shape
+
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type VehicleType = {
+  id: string;
+  driverId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  name: string | null;
+  plate: string;
+  lastLat: number | null;
+  lastLng: number | null;
+  lastHeading: number | null;
+  lastSpeed: number | null;
+  lastPingAt: Date | null;
+};
+
+export type OperationWithRelations = OperationType & {
+  vehicle: VehicleType | null;
+  driver: User | null;
+  guide: User | null;
 };

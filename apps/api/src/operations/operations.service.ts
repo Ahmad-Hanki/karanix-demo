@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateOperationDto } from './dto/create-operation.dto';
 import { UpdateOperationDto } from './dto/update-operation.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { OperationStatus } from '@prisma/client';
+import { OperationStatus, Prisma } from '@prisma/client';
 
 @Injectable()
 export class OperationsService {
@@ -12,7 +12,13 @@ export class OperationsService {
     return 'This action adds a new operation';
   }
 
-  async listAllOperations(date?: string, status?: OperationStatus) {
+  async listAllOperations(
+    date?: string,
+    status?: OperationStatus,
+    vehicle?: boolean,
+    driver?: boolean,
+    guide?: boolean,
+  ) {
     const day = date ? new Date(date) : new Date();
 
     const startOfDay = new Date(day);
@@ -21,7 +27,13 @@ export class OperationsService {
     const endOfDay = new Date(day);
     endOfDay.setHours(23, 59, 59, 999);
 
-    return this.prisma.operation.findMany({
+    const include: Prisma.OperationInclude = {};
+
+    if (vehicle) include.vehicle = true;
+    if (driver) include.driver = true;
+    if (guide) include.guide = true;
+
+    const op = await this.prisma.operation.findMany({
       where: {
         date: {
           gte: startOfDay,
@@ -29,12 +41,10 @@ export class OperationsService {
         },
         ...(status ? { status } : {}),
       },
-      include: {
-        vehicle: true,
-        driver: true,
-        guide: true,
-      },
+      ...(Object.keys(include).length ? { include } : {}),
     });
+
+    return op;
   }
 
   findOne(id: number) {

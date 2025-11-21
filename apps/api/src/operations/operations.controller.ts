@@ -7,11 +7,13 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { OperationsService } from './operations.service';
 import { CreateOperationDto } from './dto/create-operation.dto';
 import { UpdateOperationDto } from './dto/update-operation.dto';
 import { OperationStatus } from '@prisma/client';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('operations')
 export class OperationsController {
@@ -23,11 +25,21 @@ export class OperationsController {
   }
 
   @Get()
-  list(
+  @UseGuards(JwtAuthGuard)
+  listAllOperations(
     @Query('date') date?: string,
     @Query('status') status?: OperationStatus,
+    @Query('vehicle') vehicle?: string,
+    @Query('driver') driver?: string,
+    @Query('guide') guide?: string,
   ) {
-    return this.operationsService.listAllOperations(date, status);
+    return this.operationsService.listAllOperations(
+      date,
+      status,
+      vehicle == 'true',
+      driver == 'true',
+      guide == 'true',
+    );
   }
 
   @Get(':id')

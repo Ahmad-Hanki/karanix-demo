@@ -52,7 +52,7 @@ export default function LoginForm({
     });
   };
   return (
-    <div className="container mx-auto min-h-screen flex items-center justify-center">
+    <div className=" min-h-screen flex items-center justify-center">
       <div className={cn("flex flex-col gap-6 ", className)} {...props}>
         <Card>
           <CardContent className="grid  md:grid-cols-2 gap-3">
