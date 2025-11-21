@@ -67,7 +67,7 @@ export type VehicleType = {
   lastPingAt: Date | null;
 };
 
-export type PaxStatus = "PLANNED" | "ACTIVE" | "COMPLETED" | "CANCELLED";
+export type PaxStatus = "WAITING" | "CHECKED_IN" | "NO_SHOW";
 
 export type PaxType = {
   id: string;

@@ -1,8 +1,6 @@
 import { Header } from "@/components/header";
 import { getOperationById } from "@/servers/operations/get-oprations-by-id";
-import { OperationData } from "./_components/operation-data";
-import { Map } from "./_components/map";
-import MainFestTable from "./_components/main-fest-table";
+import { OperationDetailClient } from "./_components/operation-detail-client";
 
 const OperationDetail = async ({
   params,
@@ -12,14 +10,12 @@ const OperationDetail = async ({
   const { id } = await params;
   const operation = await getOperationById({ id });
 
+  console.log("OperationDetail loaded operation:", operation);
+
   return (
     <div className="space-y-4">
       <Header title="Operation Detail" />
-      <OperationData data={operation.data} />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Map />
-        <MainFestTable pax={operation.data.pax} />
-      </div>
+      <OperationDetailClient initialOperation={operation.data} />
     </div>
   );
 };

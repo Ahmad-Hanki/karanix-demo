@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { CreateOperationDto } from './dto/create-operation.dto';
 import { UpdateOperationDto } from './dto/update-operation.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -44,12 +44,13 @@ export class OperationsService {
       ...(Object.keys(include).length ? { include } : {}),
     });
 
-    console.log("Fetched operations:", op);
+    console.log('Fetched operations:', op);
 
     return op;
   }
 
   async findOne(id: string) {
+    console.log('Finding operation with id:', id);
     const op = await this.prisma.operation.findUnique({
       where: { id },
       include: {
@@ -59,6 +60,16 @@ export class OperationsService {
         pax: true,
       },
     });
+
+    if (!op) {
+      throw new HttpException(
+        {
+          message: 'Operation not found',
+          error: 'Not Found',
+        },
+        404,
+      );
+    }
 
     return op;
   }
