@@ -44,7 +44,7 @@ export class OperationsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.operationsService.findOne(+id);
+    return this.operationsService.findOne(id);
   }
 
   @Patch(':id')

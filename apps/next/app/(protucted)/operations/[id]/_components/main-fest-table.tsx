@@ -1,15 +1,8 @@
-import { PaxType, PaxStatus } from "@/types";
+import { PaxType } from "@/types";
 
-const Map = ({ pax }: { pax: PaxType[] | null }) => {
+const MainFestTable = ({ pax }: { pax: PaxType[] | null }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {/* Map placeholder (real Google Maps later) */}
-      <div className="border rounded-lg p-4 h-[400px] flex items-center justify-center">
-        <span className="text-gray-500 text-sm">
-          Map will be here (Google Maps + live vehicle marker)
-        </span>
-      </div>
-
+    <div>
       {/* Manifest table */}
       <div className="border rounded-lg p-4">
         <h2 className="font-semibold mb-2">Manifest</h2>
@@ -55,4 +48,4 @@ const Map = ({ pax }: { pax: PaxType[] | null }) => {
   );
 };
 
-export { Map };
+export default MainFestTable;

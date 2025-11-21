@@ -2,6 +2,7 @@ import { Header } from "@/components/header";
 import { getOperationById } from "@/servers/operations/get-oprations-by-id";
 import { OperationData } from "./_components/operation-data";
 import { Map } from "./_components/map";
+import MainFestTable from "./_components/main-fest-table";
 
 const OperationDetail = async ({
   params,
@@ -15,7 +16,10 @@ const OperationDetail = async ({
     <div className="space-y-4">
       <Header title="Operation Detail" />
       <OperationData data={operation.data} />
-      <Map pax={operation.data.pax} />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Map />
+        <MainFestTable pax={operation.data.pax} />
+      </div>
     </div>
   );
 };

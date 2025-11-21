@@ -44,11 +44,23 @@ export class OperationsService {
       ...(Object.keys(include).length ? { include } : {}),
     });
 
+    console.log("Fetched operations:", op);
+
     return op;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} operation`;
+  async findOne(id: string) {
+    const op = await this.prisma.operation.findUnique({
+      where: { id },
+      include: {
+        vehicle: true,
+        driver: { select: { id: true, name: true } },
+        guide: { select: { id: true, name: true } },
+        pax: true,
+      },
+    });
+
+    return op;
   }
 
   update(id: number, updateOperationDto: UpdateOperationDto) {

@@ -13,6 +13,8 @@ const OperationsPage = async ({
   const loadedParams = loadSearchParams(awaitedParams);
   const { operations } = await PreloadData({ searchParams: loadedParams });
 
+  console.log("OperationsPage loaded operations:", operations);
+
   return (
     <div className="space-y-4">
       <Header title="Operations" />

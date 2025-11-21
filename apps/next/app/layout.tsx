@@ -9,11 +9,11 @@ import {
 } from "@tanstack/react-query";
 import { getAuthCookieServer } from "@/lib/auth-cookies";
 import { ApiError } from "@/types";
-import { AppProvider } from "./providers/query-client-provider";
 import { CookiesProvider } from "next-client-cookies/server";
 import { ToastContainer } from "react-toastify";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import Nav from "@/components/navbar";
+import { AppProvider } from "@/providers/query-client-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
