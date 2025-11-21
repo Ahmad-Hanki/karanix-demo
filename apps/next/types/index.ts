@@ -89,3 +89,21 @@ export type OperationWithRelations = OperationType & {
   guide: User | null;
   pax: PaxType[] | null;
 };
+
+export enum CheckinMethod {
+  MANUAL = "MANUAL",
+  QR_CODE = "QR_CODE",
+  NFC = "NFC",
+}
+
+export type CheckInEventType = {
+  id: string;
+  createdAt: Date;
+  operationId: string;
+  eventId: string;
+  method: CheckinMethod;
+  gpsLat: number | null;
+  gpsLng: number | null;
+  photoUrl: string | null;
+  paxId: string;
+};

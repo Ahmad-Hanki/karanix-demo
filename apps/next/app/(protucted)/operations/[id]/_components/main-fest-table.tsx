@@ -1,8 +1,5 @@
-// app/operations/[id]/_components/main-fest-table.tsx
-"use client";
-
-import { Button } from "@/components/ui/button";
 import { PaxType } from "@/types";
+import TableContent from "./table-content";
 
 type Props = {
   pax: PaxType[];
@@ -10,8 +7,6 @@ type Props = {
 };
 
 const MainFestTable = ({ pax }: Props) => {
-  const handleCheckin = async (paxId: string) => {};
-
   return (
     <div className="border rounded-lg p-4">
       <h2 className="font-semibold mb-2">Manifest</h2>
@@ -27,22 +22,7 @@ const MainFestTable = ({ pax }: Props) => {
         </thead>
         <tbody>
           {pax.map((p) => (
-            <tr key={p.id} className="border-b">
-              <td className="py-1">{p.seatNo ?? "—"}</td>
-              <td className="py-1">{p.name}</td>
-              <td className="py-1">{p.pickupAddress ?? "—"}</td>
-              <td className="py-1">{p.status}</td>
-              <td className="py-1 text-right">
-                <Button
-                  variant={"outline"}
-                  onClick={() => handleCheckin(p.id)}
-                  disabled={p.status == "CHECKED_IN"}
-                  className="text-xs px-2 py-1 border rounded disabled:opacity-50"
-                >
-                  Check-in
-                </Button>
-              </td>
-            </tr>
+            <TableContent p={p} />
           ))}
           {pax.length === 0 && (
             <tr>

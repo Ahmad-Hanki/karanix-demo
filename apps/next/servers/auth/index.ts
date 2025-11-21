@@ -15,7 +15,7 @@ export const loginInputSchema = z.object({
 
 export type LoginInput = z.infer<typeof loginInputSchema>;
 
-export const createDiscussion = async ({
+export const Login = async ({
   data,
 }: {
   data: LoginInput;
@@ -25,7 +25,7 @@ export const createDiscussion = async ({
 };
 
 type useLoginOptions = {
-  mutationConfig?: MutationConfig<typeof createDiscussion>;
+  mutationConfig?: MutationConfig<typeof Login>;
 };
 
 export const useLogin = ({ mutationConfig }: useLoginOptions = {}) => {
@@ -44,7 +44,7 @@ export const useLogin = ({ mutationConfig }: useLoginOptions = {}) => {
       onSuccess?.(...args);
     },
     ...restConfig,
-    mutationFn: createDiscussion,
+    mutationFn: Login,
   });
 };
 
