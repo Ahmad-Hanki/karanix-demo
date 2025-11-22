@@ -2,18 +2,29 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate } from "@/lib/utils";
 import { useStartOperation } from "@/servers/operations/start-opration";
-import { OperationStatus, OperationWithRelations } from "@/types";
+import { AlertPayload, OperationStatus, OperationWithRelations } from "@/types";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { CheckButton } from "./check-button";
 
-const OperationData = ({ data }: { data: OperationWithRelations }) => {
-  const [status, setStatus] = useState<OperationStatus>(data.status);
+const OperationData = ({
+  data,
+  status,
+  setStatus,
+  setAlert,
+}: {
+  data: OperationWithRelations;
+  status: OperationStatus;
+  setStatus: React.Dispatch<React.SetStateAction<OperationStatus>>;
+  setAlert: React.Dispatch<React.SetStateAction<AlertPayload | null>>;
+}) => {
   const { mutate, isPending: isStarting } = useStartOperation({
     mutationConfig: {
       onSuccess: (data) => {
         if (data) {
           toast.success("Operation started successfully!");
           setStatus("ACTIVE");
+          setAlert(null);
         }
       },
     },
@@ -21,8 +32,9 @@ const OperationData = ({ data }: { data: OperationWithRelations }) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>
-          {data.tourName} ({data.code} ) {status && ` - ${status}`}
+        <CardTitle className="flex justify-between items-center gap-3">
+          {data.tourName} ({data.code} ) {status && ` - ${status}`}{" "}
+          <CheckButton id={data.id} status={status} />
         </CardTitle>
 
         <Button

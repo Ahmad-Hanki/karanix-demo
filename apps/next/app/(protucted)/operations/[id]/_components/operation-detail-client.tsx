@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { OperationWithRelations, PaxType } from "@/types";
+import {
+  AlertPayload,
+  OperationWithRelations,
+  PaxType,
+  PaxUpdatedEvent,
+  VehiclePositionEvent,
+} from "@/types";
 import { OperationData } from "./operation-data";
 import { Map } from "./map";
 import MainFestTable from "./main-fest-table";
@@ -10,20 +16,6 @@ import { toast } from "react-toastify";
 
 type OperationDetailClientProps = {
   initialOperation: OperationWithRelations;
-};
-
-type VehiclePositionEvent = {
-  vehicleId: string;
-  lat: number;
-  lng: number;
-  heading?: number | null;
-  speed?: number | null;
-  timestamp: string;
-};
-
-type PaxUpdatedEvent = {
-  paxId: string;
-  status: PaxType["status"];
 };
 
 export const OperationDetailClient = ({
@@ -43,6 +35,9 @@ export const OperationDetailClient = ({
         }
       : null
   );
+
+  const [status, setStatus] = useState(initialOperation.status);
+  const [alert, setAlert] = useState<AlertPayload | null>(null);
 
   // join socket room + listen for events
   useEffect(() => {
@@ -67,20 +62,19 @@ export const OperationDetailClient = ({
       );
     };
 
-    const handleAlert = (payload: any) => {
-      console.log("⚠ operation_alert", payload);
+    const handleAlert = (payload: AlertPayload) => {
+      console.log("operation_alert", payload);
 
-      let message = payload?.message as string | undefined;
-
-      if (!message && payload?.type === "STATUS_CHANGE" && payload?.status) {
-        message = `Operation is now ${payload.status}`;
+      if (payload?.type === "STATUS_CHANGE" && (payload as any).status) {
+        setStatus((payload as any).status);
+        return;
       }
 
-      if (!message) {
-        message = "Operation alert";
+      if (payload?.type === "LOW_CHECKIN") {
+        setAlert(payload);
       }
 
-      toast.warn(message);
+      toast.info(`Alert: ${payload.message || payload.type}`);
     };
 
     socket.on("vehicle_position", handleVehiclePosition);
@@ -97,7 +91,23 @@ export const OperationDetailClient = ({
 
   return (
     <>
-      <OperationData data={initialOperation} />
+      {alert && (
+        <div className="mb-2 rounded bg-red-500 text-white text-sm px-3 py-2">
+          {alert.message ?? "Low check-in rate for this operation."}
+          {typeof alert.ratio === "number" && (
+            <span className="ml-2 text-xs">
+              ({Math.round(alert.ratio * 100)}% checked in –{" "}
+              {alert.checkedInCount}/{alert.totalPax})
+            </span>
+          )}
+        </div>
+      )}
+      <OperationData
+        data={initialOperation}
+        setStatus={setStatus}
+        status={status}
+        setAlert={setAlert}
+      />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Map pax={paxList} vehiclePos={vehiclePos} />
         <MainFestTable pax={paxList} operationId={initialOperation.id} />

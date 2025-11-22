@@ -107,3 +107,27 @@ export type CheckInEventType = {
   photoUrl: string | null;
   paxId: string;
 };
+
+export type VehiclePositionEvent = {
+  vehicleId: string;
+  lat: number;
+  lng: number;
+  heading?: number | null;
+  speed?: number | null;
+  timestamp: string;
+};
+
+export type AlertPayload = {
+  type?: string;
+  message?: string;
+  ratio?: number;
+  checkedInCount?: number;
+  totalPax?: number;
+  alerted?: boolean;
+  reason?: string;
+};
+
+export type PaxUpdatedEvent = {
+  paxId: string;
+  status: PaxType["status"];
+};

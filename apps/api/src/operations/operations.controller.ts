@@ -46,11 +46,16 @@ export class OperationsController {
   findOne(@Param('id') id: string) {
     return this.operationsService.findOne(id);
   }
-  
+
   @UseGuards(JwtAuthGuard)
   @Post(':id/start')
   start(@Param('id') id: string) {
     return this.operationsService.startOperation(id);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/check-alert')
+  async checkAlert(@Param('id') id: string) {
+    return this.operationsService.checkLowCheckinForOperation(id);
   }
 
   @Delete(':id')

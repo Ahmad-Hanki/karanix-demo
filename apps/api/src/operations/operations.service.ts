@@ -113,6 +113,67 @@ export class OperationsService {
     return updated;
   }
 
+  async checkLowCheckinForOperation(id: string) {
+    const op = await this.prisma.operation.findUnique({
+      where: { id },
+    });
+
+    if (!op) throw new NotFoundException('Operation not found');
+
+    // rule only applies to ACTIVE operations
+    if (op.status !== OperationStatus.ACTIVE) {
+      return {
+        alerted: false,
+        reason: 'Operation is not ACTIVE',
+      };
+    }
+
+    const now = new Date();
+    const startPlus15 = new Date(op.startTime);
+    startPlus15.setMinutes(startPlus15.getMinutes() + 15);
+
+    if (now < startPlus15) {
+      return {
+        alerted: false,
+        reason: 'Too early, startTime + 15min not reached yet',
+      };
+    }
+
+    if (op.totalPax === 0) {
+      return {
+        alerted: false,
+        reason: 'No pax on this operation',
+      };
+    }
+
+    const ratio = op.checkedInCount / op.totalPax;
+
+    if (ratio >= 0.7) {
+      return {
+        alerted: false,
+        reason: 'Check-in ratio >= 0.7',
+        ratio,
+      };
+    }
+
+    // --------------- ALERT! ---------------
+    const payload = {
+      type: 'LOW_CHECKIN',
+      message: 'Low check-in rate (< 70% after 15 minutes).',
+      ratio,
+      checkedInCount: op.checkedInCount,
+      totalPax: op.totalPax,
+      operationId: op.id,
+    };
+
+    this.realtime.emitAlert(id, payload);
+
+    return {
+      alerted: true,
+      ...payload,
+    };
+  }
+
   remove(id: number) {
     return `This action removes a #${id} operation`;
   }

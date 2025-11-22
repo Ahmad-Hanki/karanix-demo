@@ -22,7 +22,7 @@ const MainFestTable = ({ pax }: Props) => {
         </thead>
         <tbody>
           {pax.map((p) => (
-            <TableContent p={p} />
+            <TableContent p={p} key={p.id} />
           ))}
           {pax.length === 0 && (
             <tr>
