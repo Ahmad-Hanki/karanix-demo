@@ -51,6 +51,11 @@ export const OperationDetailClient = ({
     const handleVehiclePosition = (payload: VehiclePositionEvent) => {
       console.log("vehicle_position", payload);
       setVehiclePos({ lat: payload.lat, lng: payload.lng });
+      toast.info(
+        `Vehicle position updated: (${payload.lat.toFixed(
+          4
+        )}, ${payload.lng.toFixed(4)})`
+      );
     };
 
     const handlePaxUpdated = (payload: PaxUpdatedEvent) => {
