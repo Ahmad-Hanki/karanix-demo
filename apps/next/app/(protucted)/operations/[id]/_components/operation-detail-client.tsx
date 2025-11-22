@@ -69,7 +69,18 @@ export const OperationDetailClient = ({
 
     const handleAlert = (payload: any) => {
       console.log("⚠ operation_alert", payload);
-      toast.warn(`Alert: ${payload.message}`);
+
+      let message = payload?.message as string | undefined;
+
+      if (!message && payload?.type === "STATUS_CHANGE" && payload?.status) {
+        message = `Operation is now ${payload.status}`;
+      }
+
+      if (!message) {
+        message = "Operation alert";
+      }
+
+      toast.warn(message);
     };
 
     socket.on("vehicle_position", handleVehiclePosition);

@@ -19,7 +19,6 @@ export class RealtimeGateway {
   @WebSocketServer()
   server: Server;
 
-  // client tells us which operation to follow
   @SubscribeMessage('join_operation')
   handleJoinOperation(
     @ConnectedSocket() client: Socket,

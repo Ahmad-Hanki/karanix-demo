@@ -85,13 +85,7 @@ const Map = ({ pax, vehiclePos }: MapProps) => {
           ) : null
         )}
 
-        {/* Vehicle marker */}
-        {vehiclePos && (
-          <Marker
-            position={vehiclePos}
-            // You can customise icon later if you want a bus icon
-          />
-        )}
+        {vehiclePos && <Marker position={vehiclePos} />}
       </GoogleMap>
     </div>
   );

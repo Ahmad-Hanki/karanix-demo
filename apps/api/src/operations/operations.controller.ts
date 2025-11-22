@@ -46,13 +46,11 @@ export class OperationsController {
   findOne(@Param('id') id: string) {
     return this.operationsService.findOne(id);
   }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateOperationDto: UpdateOperationDto,
-  ) {
-    return this.operationsService.update(+id, updateOperationDto);
+  
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/start')
+  start(@Param('id') id: string) {
+    return this.operationsService.startOperation(id);
   }
 
   @Delete(':id')

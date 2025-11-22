@@ -1,12 +1,21 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateOperationDto } from './dto/create-operation.dto';
 import { UpdateOperationDto } from './dto/update-operation.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { OperationStatus, Prisma } from '@prisma/client';
+import { RealtimeGateway } from 'src/realtime/realtime.gateway';
 
 @Injectable()
 export class OperationsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private realtime: RealtimeGateway,
+  ) {}
 
   create(createOperationDto: CreateOperationDto) {
     return 'This action adds a new operation';
@@ -74,8 +83,34 @@ export class OperationsService {
     return op;
   }
 
-  update(id: number, updateOperationDto: UpdateOperationDto) {
-    return `This action updates a #${id} operation`;
+  async startOperation(id: string) {
+    const op = await this.prisma.operation.findUnique({ where: { id } });
+    if (!op) throw new NotFoundException('Operation not found');
+
+    if (op.status === OperationStatus.ACTIVE) {
+      throw new BadRequestException('Operation is already active');
+    }
+    if (
+      op.status === OperationStatus.COMPLETED ||
+      op.status === OperationStatus.CANCELLED
+    ) {
+      throw new BadRequestException(
+        'Cannot start a completed/cancelled operation',
+      );
+    }
+
+    const updated = await this.prisma.operation.update({
+      where: { id },
+      data: { status: OperationStatus.ACTIVE },
+    });
+
+    // Optional WS event: status change / alert
+    this.realtime.emitAlert(id, {
+      type: 'STATUS_CHANGE',
+      status: updated.status,
+    });
+
+    return updated;
   }
 
   remove(id: number) {

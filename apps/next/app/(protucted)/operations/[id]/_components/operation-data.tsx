@@ -1,22 +1,43 @@
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate } from "@/lib/utils";
-import { OperationWithRelations } from "@/types";
+import { useStartOperation } from "@/servers/operations/start-opration";
+import { OperationStatus, OperationWithRelations } from "@/types";
+import { useState } from "react";
+import { toast } from "react-toastify";
 
 const OperationData = ({ data }: { data: OperationWithRelations }) => {
+  const [status, setStatus] = useState<OperationStatus>(data.status);
+  const { mutate, isPending: isStarting } = useStartOperation({
+    mutationConfig: {
+      onSuccess: (data) => {
+        if (data) {
+          toast.success("Operation started successfully!");
+          setStatus("ACTIVE");
+        }
+      },
+    },
+  });
   return (
     <Card>
       <CardHeader>
         <CardTitle>
-          {data.tourName} ({data.code})
+          {data.tourName} ({data.code} ) {status && ` - ${status}`}
         </CardTitle>
+
+        <Button
+          onClick={() => {
+            mutate({ id: data.id });
+          }}
+          disabled={status === "ACTIVE" || status === "COMPLETED" || isStarting}
+          className="w-fit"
+        >
+          {status === "ACTIVE"
+            ? "Operation Active"
+            : isStarting
+              ? "Starting..."
+              : "Start Operation"}
+        </Button>
       </CardHeader>
       <CardContent>
         <div>
@@ -26,7 +47,7 @@ const OperationData = ({ data }: { data: OperationWithRelations }) => {
           <strong>Start:</strong> {formatDate(data.startTime, "hour-minute")}
         </div>
         <div>
-          <strong>Status:</strong> {data.status}
+          <strong>Status:</strong> {status}
         </div>
         <div>
           <strong>Vehicle:</strong>{" "}
