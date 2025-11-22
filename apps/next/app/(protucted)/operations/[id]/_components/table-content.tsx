@@ -5,13 +5,26 @@ import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
 
-const TableContent = ({ p }: { p: PaxType }) => {
+const TableContent = ({
+  p,
+  setPaxList,
+  operationId,
+}: {
+  p: PaxType;
+  setPaxList: React.Dispatch<React.SetStateAction<PaxType[]>>;
+  operationId: string;
+}) => {
   const [checkedInStatus, setCheckedInStatus] = useState<PaxStatus>(p.status);
   const { mutate, isPending } = useCheckIn({
     mutationConfig: {
       onSuccess: (data) => {
         toast.success(`Pax ${p.name} checked in successfully!`);
         setCheckedInStatus("CHECKED_IN");
+        setPaxList((prev) =>
+          prev.map((px) =>
+            px.id === p.id ? { ...px, status: "CHECKED_IN" } : px
+          )
+        );
       },
       onError: (error) => {
         toast.error(

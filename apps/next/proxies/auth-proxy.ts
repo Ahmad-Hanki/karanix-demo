@@ -20,7 +20,10 @@ export const authProxy: ProxyFactory = (next: NextProxy) => {
       return NextResponse.redirect(signInUrl);
     }
 
-    // Continue to the next proxy in the chain
+    if (cookie && pathname == "/") {
+      const operationsUrl = new URL("/operations", baseUrl);
+      return NextResponse.redirect(operationsUrl);
+    }
     return next(request, event);
   };
 };

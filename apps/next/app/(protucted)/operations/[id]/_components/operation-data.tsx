@@ -2,8 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate } from "@/lib/utils";
 import { useStartOperation } from "@/servers/operations/start-opration";
-import { AlertPayload, OperationStatus, OperationWithRelations } from "@/types";
-import { useState } from "react";
+import { AlertPayload, OperationStatus, OperationWithRelations, PaxType } from "@/types";
 import { toast } from "react-toastify";
 import { CheckButton } from "./check-button";
 
@@ -14,6 +13,7 @@ const OperationData = ({
   setAlert,
 }: {
   data: OperationWithRelations;
+  pax?: PaxType[];
   status: OperationStatus;
   setStatus: React.Dispatch<React.SetStateAction<OperationStatus>>;
   setAlert: React.Dispatch<React.SetStateAction<AlertPayload | null>>;

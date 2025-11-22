@@ -3,10 +3,11 @@ import TableContent from "./table-content";
 
 type Props = {
   pax: PaxType[];
+  setPaxList: React.Dispatch<React.SetStateAction<PaxType[]>>;
   operationId: string;
 };
 
-const MainFestTable = ({ pax }: Props) => {
+const MainFestTable = ({ pax, setPaxList, operationId }: Props) => {
   return (
     <div className="border rounded-lg p-4">
       <h2 className="font-semibold mb-2">Manifest</h2>
@@ -22,7 +23,12 @@ const MainFestTable = ({ pax }: Props) => {
         </thead>
         <tbody>
           {pax.map((p) => (
-            <TableContent p={p} key={p.id} />
+            <TableContent
+              p={p}
+              key={p.id}
+              setPaxList={setPaxList}
+              operationId={operationId}
+            />
           ))}
           {pax.length === 0 && (
             <tr>

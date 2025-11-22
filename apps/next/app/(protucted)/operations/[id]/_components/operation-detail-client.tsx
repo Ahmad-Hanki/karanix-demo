@@ -108,6 +108,7 @@ export const OperationDetailClient = ({
         </div>
       )}
       <OperationData
+        pax={paxList}
         data={initialOperation}
         setStatus={setStatus}
         status={status}
@@ -115,7 +116,11 @@ export const OperationDetailClient = ({
       />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Map pax={paxList} vehiclePos={vehiclePos} />
-        <MainFestTable pax={paxList} operationId={initialOperation.id} />
+        <MainFestTable
+          pax={paxList}
+          operationId={initialOperation.id}
+          setPaxList={setPaxList}
+        />
       </div>
     </>
   );

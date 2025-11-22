@@ -3,6 +3,9 @@ import { loadSearchParams } from "./_lib/search-params";
 import { OperationsTable } from "./_components/operations-table";
 import PreloadData from "./_lib/preload-data";
 import { Header } from "@/components/header";
+import { Filters } from "./_components/filters";
+import { OperationsWrapperProvider } from "@/hooks/transition-context";
+import { OperationWrapperLoading } from "./_components/operation-wrapper";
 
 const OperationsPage = async ({
   searchParams,
@@ -16,10 +19,16 @@ const OperationsPage = async ({
   console.log("OperationsPage loaded operations:", operations);
 
   return (
-    <div className="space-y-4">
-      <Header title="Operations" />
-      <OperationsTable operations={operations} />
-    </div>
+    <OperationsWrapperProvider>
+      <div className="space-y-4">
+        <Header title="Operations">
+          <Filters />
+        </Header>
+        <OperationWrapperLoading>
+          <OperationsTable operations={operations} />
+        </OperationWrapperLoading>
+      </div>
+    </OperationsWrapperProvider>
   );
 };
 

@@ -35,7 +35,7 @@ export default function LoginForm({
   const { mutate, isPending } = useLogin({
     mutationConfig: {
       onSuccess: () => {
-        router.replace("/");
+        router.replace("/operations");
       },
       onError: (error) => {
         console.log("Login error:", error);
