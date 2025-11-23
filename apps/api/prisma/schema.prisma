@@ -7,264 +7,134 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/* -------------------------------------------------------
-   ENUMS — fixed values used in models
--------------------------------------------------------- */
-
 enum UserRole {
-  OPS_MANAGER   // Manager who sees dashboard + operations
-  DRIVER        // Driver of the vehicle
-  GUIDE         // Guide who checks in passengers
+  OPS_MANAGER
+  DRIVER
+  GUIDE
 }
 
 enum OperationStatus {
-  PLANNED       // Operation not started yet
-  ACTIVE        // Started (driver sending GPS)
-  COMPLETED     // Finished
-  CANCELLED     // Cancelled
+  PLANNED
+  ACTIVE
+  COMPLETED
+  CANCELLED
 }
 
 enum PaxStatus {
-  WAITING       // Not checked in yet
-  CHECKED_IN    // Successfully checked in
-  NO_SHOW       // Passenger did not show up
+  WAITING
+  CHECKED_IN
+  NO_SHOW
 }
 
 enum CheckinMethod {
-  QR            // Checked in with QR
-  MANUAL        // Checked in manually
+  QR
+  MANUAL
 }
-
-
-/* -------------------------------------------------------
-   USER MODEL — Drivers, Guides, Ops Managers
--------------------------------------------------------- */
 
 model User {
-  id        String   @id @default(cuid()) 
-  // Unique ID for user
-
-  name      String   
-  // Full name of the user
-
+  id        String   @id @default(cuid())
+  name      String
   email     String   @unique
-  // Login email OR identification email
-
-  role      UserRole 
-  // OPS_MANAGER, DRIVER or GUIDE
-
+  role      UserRole
   password  String
-
   createdAt DateTime @default(now())
-  // When user was created
-
   updatedAt DateTime @updatedAt
-  // Auto-updated on each change
-
-  // RELATIONS:
 
   vehicles         Vehicle[]   @relation("UserVehicles")
-  // If user is a DRIVER: list of vehicles they drive
-
   driverOperations Operation[] @relation("DriverOperations")
-  // Operations where this user is assigned as the DRIVER
-
   guideOperations  Operation[] @relation("GuideOperations")
-  // Operations where this user is assigned as the GUIDE
 }
-
-
-/* -------------------------------------------------------
-   VEHICLE MODEL — Buses, Vans, Cars
--------------------------------------------------------- */
 
 model Vehicle {
   id       String  @id @default(cuid())
-  // Unique ID for the vehicle
-
   plate    String
-  // License plate number
-
   name     String?
-  // Optional name (e.g. “Sprinter 1”)
-
   driverId String?
   driver   User?   @relation("UserVehicles", fields: [driverId], references: [id])
-  // The assigned DRIVER for the vehicle
 
-  // LAST KNOWN GPS POSITION (for quick dashboard loading)
   lastLat     Float?
   lastLng     Float?
   lastHeading Float?
   lastSpeed   Float?
   lastPingAt  DateTime?
-  // These are updated every time driver sends /heartbeat
 
-  // RELATIONS:
   heartbeats Heartbeat[]
-  // History of all GPS pings received
-
   operations Operation[]
-  // All operations that use this vehicle
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
-
-
-/* -------------------------------------------------------
-   OPERATION MODEL — Each Tour / Activity / Trip
--------------------------------------------------------- */
 
 model Operation {
   id             String          @id @default(cuid())
-  // Unique ID for the operation
-
   code           String          @unique
-  // Human-readable code (e.g. “OP-TODAY-001”)
-
   tourName       String
-  // Name of the tour (e.g. “Morning City Tour”)
-
   date           DateTime
-  // Day of the tour (used for today/tomorrow filtering)
-
   startTime      DateTime
-  // When the tour is planned to begin
-
   status         OperationStatus
-  // PLANNED, ACTIVE, COMPLETED, CANCELLED
-
   totalPax       Int             @default(0)
-  // Number of passengers in manifest
-
   checkedInCount Int             @default(0)
-  // How many have checked in so far
-
+  
   vehicleId String?
   vehicle   Vehicle? @relation(fields: [vehicleId], references: [id])
-  // Vehicle assigned to this operation
 
   driverId String?
   driver   User?   @relation("DriverOperations", fields: [driverId], references: [id])
-  // Driver assigned
 
   guideId String?
   guide   User?   @relation("GuideOperations", fields: [guideId], references: [id])
-  // Guide who checks-in passengers
 
   route Json?
-  // GPS route (array of lat/lng points OR polyline)
 
-  // RELATIONS:
   pax        Pax[]
-  // List of passengers on this operation
-
   heartbeats Heartbeat[]
-  // When operation is active, heartbeats also connect to this
-
   checkins   CheckinEvent[]
-  // Check-in events (for history / logs / idempotency)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-
-/* -------------------------------------------------------
-   PAX MODEL — Passengers
--------------------------------------------------------- */
-
 model Pax {
   id          String    @id @default(cuid())
-  // Unique ID for passenger row
-
   operationId String
   operation   Operation @relation(fields: [operationId], references: [id])
-  // Which operation they belong to
-
-  name  String
-  // Passenger name
-
-  phone String?
-  // Optional phone number
-
-  pickupLat     Float
-  pickupLng     Float
+  name        String
+  phone       String?
+  pickupLat   Float
+  pickupLng   Float
   pickupAddress String?
-  // Pickup location for map markers
-
-  seatNo Int?
-  // Seat number assigned by guide/manager
-
-  status PaxStatus @default(WAITING)
-  // WAITING, CHECKED_IN, NO_SHOW
+  seatNo      Int?
+  status      PaxStatus @default(WAITING)
 
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
-
   checkinEvents CheckinEvent[]
-  // All check-in attempts (manual or QR)
 }
-
-
-/* -------------------------------------------------------
-   HEARTBEAT MODEL — Driver GPS updates
--------------------------------------------------------- */
 
 model Heartbeat {
-  id        String  @id @default(cuid())
-  // ID of this GPS record
-
-  vehicleId String
-  vehicle   Vehicle @relation(fields: [vehicleId], references: [id])
-  // Which vehicle sent this GPS ping
-
+  id          String  @id @default(cuid())
+  vehicleId   String
+  vehicle     Vehicle @relation(fields: [vehicleId], references: [id])
   operationId String?
   operation   Operation? @relation(fields: [operationId], references: [id])
-  // Optional: which operation was active during this heartbeat
-
-  lat       Float
-  lng       Float
-  speed     Float?
-  heading   Float?
-  // GPS data sent by driver every ~15 seconds
-
-  timestamp DateTime
-  // When the GPS was recorded
-
-  createdAt DateTime @default(now())
+  lat         Float
+  lng         Float
+  speed       Float?
+  heading     Float?
+  timestamp   DateTime
+  createdAt   DateTime @default(now())
 }
 
-
-/* -------------------------------------------------------
-   CHECKIN EVENT MODEL — When Guide Checks in Pax
--------------------------------------------------------- */
-
 model CheckinEvent {
-  id      String @id @default(cuid())
-  // Unique ID for the event
-
-  eventId String @unique
-  // Idempotency: if same eventId comes again → ignore
-
-  paxId String
-  pax   Pax    @relation(fields: [paxId], references: [id])
-  // Passenger who was checked in
-
+  id          String @id @default(cuid())
+  eventId     String @unique
+  paxId       String
+  pax         Pax    @relation(fields: [paxId], references: [id])
   operationId String
   operation   Operation @relation(fields: [operationId], references: [id])
-  // Operation they belong to
-
-  method   CheckinMethod
-  // Manual or QR
-
-  gpsLat   Float?
-  gpsLng   Float?
-  // Where they checked in
-
-  photoUrl String?
-  // Optional photo (face validation etc.)
-
-  createdAt DateTime @default(now())
+  method      CheckinMethod
+  gpsLat      Float?
+  gpsLng      Float?
+  photoUrl    String?
+  createdAt   DateTime @default(now())
 }

@@ -18,7 +18,7 @@ async function main() {
   const opsManager = await prisma.user.create({
     data: {
       name: 'Operations Manager',
-      email: 'itxti909@gmail.com',
+      email: 'admin@karanix.com',
       role: UserRole.OPS_MANAGER,
       password: await hash('12345'),
     },

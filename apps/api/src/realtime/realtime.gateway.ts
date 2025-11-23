@@ -19,6 +19,16 @@ export class RealtimeGateway {
   @WebSocketServer()
   server: Server;
 
+  // @SubscribeMessage('ping_server')
+  // handlePing(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+  //   this.logger.debug(`Received ping from ${client.id}:`, data);
+
+  //   client.emit('pong_client', {
+  //     reply: 'hello client',
+  //     received: data.message,
+  //   });
+  // }
+
   @SubscribeMessage('join_operation')
   handleJoinOperation(
     @ConnectedSocket() client: Socket,
