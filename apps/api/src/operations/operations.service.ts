@@ -104,7 +104,7 @@ export class OperationsService {
       data: { status: OperationStatus.ACTIVE },
     });
 
-    // Optional WS event: status change / alert
+    
     this.realtime.emitAlert(id, {
       type: 'STATUS_CHANGE',
       status: updated.status,
@@ -120,7 +120,6 @@ export class OperationsService {
 
     if (!op) throw new NotFoundException('Operation not found');
 
-    // rule only applies to ACTIVE operations
     if (op.status !== OperationStatus.ACTIVE) {
       return {
         alerted: false,
